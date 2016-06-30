@@ -1,4 +1,4 @@
-module crossbar_2m_2s(
+module crossbar_2m2s(
   input wire master_1_req, master_2_req, 
   input wire slave_1_ack, slave_2_ack,
   input wire [31:0] master_1_addr, master_2_addr,
@@ -58,15 +58,6 @@ connect_req_m2_s1 = (~master_2_addr[31]) & (master_2_req);
 connect_req_m1_s2 = (master_1_addr[31]) & (master_1_req);
 connect_req_m2_s2 = (master_2_addr[31]) & (master_2_req);
 
-//set last connection to slave 2 for both masters
-if (last_con_to_s1 | ~last_con_to_s1) 
- begin
- end
-else last_con_to_s1 = 1'b1;
-if (last_con_to_s2 | ~last_con_to_s2) 
- begin
- end
-else last_con_to_s2 = 1'b1;
 
 //resolving case if two M going to one slave
 if (master_1_req & master_2_req)
@@ -88,14 +79,14 @@ if (master_1_req & master_2_req)
 	    	//connect 1 master
 		connect_approved_m1_s1 = 1'b1;
 		connect_approved_m2_s1 = 1'b0;
-		last_con_to_s1 = 1'b0;
+		//last_con_to_s1 = 1'b0;
 	  	end
 	     else
 	  	begin
 	    	//connect 2 master
 		connect_approved_m2_s1 = 1'b1;
 		connect_approved_m1_s1 = 1'b0;
-		last_con_to_s1 = 1'b1;
+		//last_con_to_s1 = 1'b1;
 	  	end
 	     end
 	     
@@ -108,14 +99,14 @@ if (master_1_req & master_2_req)
 	    	//connect 1 master
 		connect_approved_m1_s2 = 1'b1;
 		connect_approved_m2_s2 = 1'b0;
-		last_con_to_s2 = 1'b0;
+		//last_con_to_s2 = 1'b0;
 	  	end
 	     else
 	  	begin
 	    	//connect 2 master
 		connect_approved_m2_s2 = 1'b1;
 		connect_approved_m1_s2 = 1'b0;
-		last_con_to_s2 = 1'b1;
+		//last_con_to_s2 = 1'b1;
 	  	end
  	  end
 
@@ -127,6 +118,7 @@ else
 	connect_approved_m1_s2 = connect_req_m1_s2;
 	connect_approved_m2_s1 = connect_req_m2_s1;
 	connect_approved_m2_s2 = connect_req_m2_s2;
+
  end
 
 wdata_approved_m1_s1 = (master_1_cmd) & (master_1_req) & (connect_approved_m1_s1);
@@ -149,38 +141,43 @@ slave_2_req = connect_req_m1_s2 | connect_req_m2_s2;
 slave_1_cmd = ((master_1_cmd) & (connect_approved_m1_s1)) | ((master_2_cmd) & (connect_approved_m2_s1));
 slave_2_cmd = ((master_1_cmd) & (connect_approved_m1_s2)) | ((master_2_cmd) & (connect_approved_m2_s2));
 
+master_1_ack = (slave_1_ack & ~(master_1_addr[31]) & connect_approved_m1_s1) | (slave_2_ack & (master_1_addr[31]) & connect_approved_m1_s2);
+master_2_ack = (slave_1_ack & ~(master_2_addr[31]) & connect_approved_m2_s1) | (slave_2_ack & (master_2_addr[31]) & connect_approved_m2_s2);
+
 for(index = 0; index < 32; index = index + 1)
   begin
 	slave_1_addr[index] = ((master_1_addr[index]) && (connect_approved_m1_s1)) || ((master_2_addr[index]) && (connect_approved_m2_s1));
 	slave_2_addr[index] = ((master_1_addr[index]) && (connect_approved_m1_s2)) || ((master_2_addr[index]) && (connect_approved_m2_s2));
   end
 
-//last connections block
-if ((master_1_req) & (connect_approved_m1_s1))
-  begin
-	connect_approved_m1_s1 = 1'b0;
-	last_con_to_s1 = 1'b0;
-  end
- if ((master_1_req) & (connect_approved_m1_s2))
-  begin
-	connect_approved_m1_s2 = 1'b0;
-	last_con_to_s2 = 1'b0;
-  end
- if ((master_2_req) & (connect_approved_m2_s1))
-  begin
-	connect_approved_m2_s1 = 1'b0;
-	last_con_to_s1 = 1'b1;
-	  end
- if ((master_2_req) & (connect_approved_m2_s2))
-  begin
-	connect_approved_m2_s2 = 1'b0;
-	last_con_to_s2 = 1'b1;
-  end
+
+/*
+if ((master_1_req) & (connect_approved_m1_s1)) 	last_con_to_s1 = 1'b0;
+if ((master_1_req) & (connect_approved_m1_s2))  last_con_to_s2 = 1'b0;
+if ((master_2_req) & (connect_approved_m2_s1))  last_con_to_s1 = 1'b1;
+if ((master_2_req) & (connect_approved_m2_s2))  last_con_to_s2 = 1'b1;*/
+
+//nullify connection approvation
+connect_approved_m1_s1 = (master_1_req) & (connect_approved_m1_s1);
+connect_approved_m1_s2 = (master_1_req) & (connect_approved_m1_s2);
+connect_approved_m2_s1 = (master_2_req) & (connect_approved_m2_s1);
+connect_approved_m2_s2 = (master_2_req) & (connect_approved_m2_s2);
 
 end
 
+always @(posedge master_1_req, posedge master_2_req)
+begin
 
+//set "last connection" initial statement to slave 2 for both masters
 
+last_con_to_s1 = ~(last_con_to_s1 | ~last_con_to_s1);
+last_con_to_s2 = ~(last_con_to_s2 | ~last_con_to_s2);
+
+last_con_to_s1 =  ~(wdata_approved_m1_s1 | rdata_approved_m1_s1) & ((wdata_approved_m2_s1 | rdata_approved_m2_s1) | last_con_to_s1);
+last_con_to_s2 =  ~(wdata_approved_m1_s2 | rdata_approved_m1_s2) & ((wdata_approved_m2_s2 | rdata_approved_m2_s2) | last_con_to_s2);
+end
+
+/*
 always @(slave_1_ack, slave_2_ack)
 begin
 
@@ -209,7 +206,7 @@ begin
 	  begin
 	  master_2_ack = slave_2_ack;
 	  end
-end
+end*/
 
 
 //data handling
@@ -222,6 +219,6 @@ slave_2_wdata[index] = (master_1_wdata[index] & wdata_approved_m1_s2) | (master_
 master_1_rdata[index] = (slave_1_rdata[index] & rdata_approved_m1_s1 & slave_1_ack) | (slave_2_rdata[index] & rdata_approved_m1_s2 & slave_2_ack);
 master_2_rdata[index] = (slave_1_rdata[index] & rdata_approved_m2_s1 & slave_1_ack) | (slave_2_rdata[index] & rdata_approved_m2_s2 & slave_2_ack);
   end
-
+end
 endmodule
 

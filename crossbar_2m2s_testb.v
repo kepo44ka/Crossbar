@@ -27,7 +27,7 @@ wire [31:0] out_slave_1_addr;
 wire [31:0] out_slave_2_addr;
 
 //instance of module being studied
-crossbar_2m_2s crossbar(
+crossbar_2m2s crossbar(
   .master_1_req(var_master_1_req),
   .master_2_req(var_master_2_req),
   .slave_1_ack(var_slave_1_ack),
@@ -84,9 +84,9 @@ var_master_1_cmd = 'b1;
 var_master_1_addr = 32'h7fffffff;
 var_master_1_wdata = 32'h11111111;
 #5;
-var_master_1_req = 'b0;
 var_slave_1_ack = 'b1;
 #5;
+var_master_1_req = 'b0;
 var_slave_1_ack = 'b0;
 #15;
 
@@ -96,9 +96,9 @@ var_master_1_cmd = 'b1;
 var_master_1_addr = 32'hffffffff;
 var_master_1_wdata = 32'h22221111;
 #5;
-var_master_1_req = 'b0;
 var_slave_2_ack = 'b1;
 #5;
+var_master_1_req = 'b0;
 var_slave_2_ack = 'b0;
 #15;
 
@@ -108,9 +108,9 @@ var_master_2_cmd = 'b1;
 var_master_2_addr = 32'h7fffffff;
 var_master_2_wdata = 32'h11112222;
 #5;
-var_master_2_req = 'b0;
 var_slave_1_ack = 'b1;
 #5;
+var_master_2_req = 'b0;
 var_slave_1_ack = 'b0;
 #15;
 
@@ -120,9 +120,9 @@ var_master_2_cmd = 'b1;
 var_master_2_addr = 32'hffffffff;
 var_master_2_wdata = 32'h22222222;
 #5;
-var_master_2_req = 'b0;
 var_slave_2_ack = 'b1;
 #5;
+var_master_2_req = 'b0;
 var_slave_2_ack = 'b0;
 #15;
 
@@ -187,11 +187,11 @@ var_master_2_cmd = 'b1;
 var_master_2_addr = 32'hffffffff;
 var_master_2_wdata = 32'h22221111;
 #5;
-var_master_1_req = 'b0;
 var_slave_1_ack = 'b1;
-var_master_2_req = 'b0;
 var_slave_2_ack = 'b1;
 #5;
+var_master_1_req = 'b0;
+var_master_2_req = 'b0;
 var_slave_1_ack = 'b0;
 var_slave_2_ack = 'b0;
 #15;
@@ -227,10 +227,10 @@ var_master_2_cmd = 'b1;
 var_master_2_addr = 32'h1fffffff;
 var_master_2_wdata = 32'h11112222;
 #5;
-var_master_1_req = 'b0;
-var_master_2_req = 'b0;
 var_slave_1_ack = 'b1;
 #5;
+var_master_1_req = 'b0;
+var_master_2_req = 'b0;
 var_slave_1_ack = 'b0;
 #15;
 
@@ -244,10 +244,10 @@ var_master_2_cmd = 'b1;
 var_master_2_addr = 32'h1fffffff;
 var_master_2_wdata = 32'h11112222;
 #5;
-var_master_1_req = 'b0;
-var_master_2_req = 'b0;
 var_slave_1_ack = 'b1;
 #5;
+var_master_1_req = 'b0;
+var_master_2_req = 'b0;
 var_slave_1_ack = 'b0;
 #15;
 
@@ -259,7 +259,7 @@ var_slave_1_rdata = 'h10000001;
 
 var_master_2_req = 'b1;
 var_master_2_cmd = 'b0;
-var_master_2_addr = 'hffffffff;
+var_master_2_addr = 'h1fffffff;
 var_slave_2_rdata = 'h20000002;
 #5;
 var_slave_1_ack = 'b1;
