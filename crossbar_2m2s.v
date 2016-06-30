@@ -12,19 +12,6 @@ module crossbar_2m2s(
   output reg [31:0] master_1_rdata, master_2_rdata,
   output reg slave_1_cmd, slave_2_cmd
 );
-/*
-reg active_slave_1_req;
-reg active_slave_2_req;
-reg active_master_1_ack;
-reg active_master_2_ack;
-reg [31:0]active_slave_1_addr;
-reg [31:0]active_slave_2_addr;
-reg [31:0]active_slave_1_wdata;
-reg [31:0]active_slave_2_wdata;
-reg [31:0]active_master_1_rdata;
-reg [31:0]active_master_2_rdata;
-reg active_slave_1_cmd;
-reg active_slave_2_cmd;*/
 
 reg connect_req_m1_s1;
 reg connect_req_m2_s1;
@@ -79,14 +66,12 @@ if (master_1_req & master_2_req)
 	    	//connect 1 master
 		connect_approved_m1_s1 = 1'b1;
 		connect_approved_m2_s1 = 1'b0;
-		//last_con_to_s1 = 1'b0;
 	  	end
 	     else
 	  	begin
 	    	//connect 2 master
 		connect_approved_m2_s1 = 1'b1;
 		connect_approved_m1_s1 = 1'b0;
-		//last_con_to_s1 = 1'b1;
 	  	end
 	     end
 	     
@@ -99,18 +84,14 @@ if (master_1_req & master_2_req)
 	    	//connect 1 master
 		connect_approved_m1_s2 = 1'b1;
 		connect_approved_m2_s2 = 1'b0;
-		//last_con_to_s2 = 1'b0;
 	  	end
 	     else
 	  	begin
 	    	//connect 2 master
 		connect_approved_m2_s2 = 1'b1;
 		connect_approved_m1_s2 = 1'b0;
-		//last_con_to_s2 = 1'b1;
 	  	end
  	  end
-
-
  end
 else
  begin
@@ -118,7 +99,6 @@ else
 	connect_approved_m1_s2 = connect_req_m1_s2;
 	connect_approved_m2_s1 = connect_req_m2_s1;
 	connect_approved_m2_s2 = connect_req_m2_s2;
-
  end
 
 wdata_approved_m1_s1 = (master_1_cmd) & (master_1_req) & (connect_approved_m1_s1);
@@ -134,7 +114,7 @@ wdata_approved_m2_s2 = (master_2_cmd) & (master_2_req) & (connect_approved_m2_s2
 rdata_approved_m2_s2 = (~(master_2_cmd)) & (master_2_req) & (connect_approved_m2_s2);
 
 
-//signals req, cmd, addr
+//signals req, cmd, ack, addr
 slave_1_req = connect_req_m1_s1 | connect_req_m2_s1;
 slave_2_req = connect_req_m1_s2 | connect_req_m2_s2;
 
@@ -151,12 +131,6 @@ for(index = 0; index < 32; index = index + 1)
   end
 
 
-/*
-if ((master_1_req) & (connect_approved_m1_s1)) 	last_con_to_s1 = 1'b0;
-if ((master_1_req) & (connect_approved_m1_s2))  last_con_to_s2 = 1'b0;
-if ((master_2_req) & (connect_approved_m2_s1))  last_con_to_s1 = 1'b1;
-if ((master_2_req) & (connect_approved_m2_s2))  last_con_to_s2 = 1'b1;*/
-
 //nullify connection approvation
 connect_approved_m1_s1 = (master_1_req) & (connect_approved_m1_s1);
 connect_approved_m1_s2 = (master_1_req) & (connect_approved_m1_s2);
@@ -169,7 +143,6 @@ always @(posedge master_1_req, posedge master_2_req)
 begin
 
 //set "last connection" initial statement to slave 2 for both masters
-
 last_con_to_s1 = ~(last_con_to_s1 | ~last_con_to_s1);
 last_con_to_s2 = ~(last_con_to_s2 | ~last_con_to_s2);
 
@@ -177,36 +150,6 @@ last_con_to_s1 =  ~(wdata_approved_m1_s1 | rdata_approved_m1_s1) & ((wdata_appro
 last_con_to_s2 =  ~(wdata_approved_m1_s2 | rdata_approved_m1_s2) & ((wdata_approved_m2_s2 | rdata_approved_m2_s2) | last_con_to_s2);
 end
 
-/*
-always @(slave_1_ack, slave_2_ack)
-begin
-
-	if ((slave_1_ack) & (master_1_addr[31]))
-	  begin
-	  end
-	else
-	  begin
-	  master_1_ack = slave_1_ack;
-	  end
-	if ((slave_1_ack) & (master_2_addr[31]))
-	  begin
-	  end
-	else
-	  begin
-	  master_2_ack = slave_1_ack;
-	  end
-
-
-	if ((slave_2_ack) & (master_1_addr[31]))
-	  begin
-	  master_1_ack = slave_2_ack;
-	  end
-
-	if ((slave_2_ack) & (master_2_addr[31]))
-	  begin
-	  master_2_ack = slave_2_ack;
-	  end
-end*/
 
 
 //data handling
