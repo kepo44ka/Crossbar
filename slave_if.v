@@ -19,15 +19,15 @@ module slave_if(
   output cmd_to_slave
 );
 
-assign req_to_slave	= req_from_crossbar;
-assign addr_to_slave	= addr_from_crossbar & {32{connect_approved_from_crossbar}};
-assign wdata_to_slave	= wdata_from_crossbar & {32{cmd_from_crossbar}} & {32{connect_approved_from_crossbar}}; //{32{cmd_from_crossbar}} <= write command
-assign cmd_to_slave	= cmd_from_crossbar & connect_approved_from_crossbar;
+assign req_to_slave = req_from_crossbar;
+assign addr_to_slave  = addr_from_crossbar & {32{connect_approved_from_crossbar}};
+assign wdata_to_slave = wdata_from_crossbar & {32{cmd_from_crossbar}} & {32{connect_approved_from_crossbar}}; //{32{cmd_from_crossbar}} <= write command
+assign cmd_to_slave = cmd_from_crossbar & connect_approved_from_crossbar;
 
-always @*
+always @(ack_from_slave, rdata_from_slave, cmd_from_crossbar, connect_approved_from_crossbar)
 begin
-  ack_to_crossbar	= ack_from_slave;
-  rdata_to_crossbar	= rdata_from_slave & ~{32{cmd_from_crossbar}} & {32{connect_approved_from_crossbar}}; //~{32{cmd_from_crossbar}} <= read command
+  ack_to_crossbar = ack_from_slave;
+  rdata_to_crossbar = rdata_from_slave & ~{32{cmd_from_crossbar}} & {32{connect_approved_from_crossbar}}; //~{32{cmd_from_crossbar}} <= read command
 end
 
 endmodule

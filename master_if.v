@@ -20,8 +20,9 @@ module master_if(
 
 assign ack_to_master	= ack_from_crossbar & connect_approved_from_crossbar;
 assign rdata_to_master	= rdata_from_crossbar & {32{ack_from_crossbar}} & {32{connect_approved_from_crossbar}};
-  
-always @*
+
+
+always @(req_from_master, addr_from_master, wdata_from_master, cmd_from_master, connect_approved_from_crossbar)
 begin
   req_to_crossbar	= req_from_master; 
   addr_to_crossbar	= addr_from_master & {32{connect_approved_from_crossbar}};

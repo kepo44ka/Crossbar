@@ -156,28 +156,25 @@ always @(posedge clk)
    last_con_to_s2 <= ~c_appr_m1_s2 & (c_appr_m2_s2 | last_con_to_s2);
 
 //connection approvation;   resolving case if two M going to one slave
-always @*
+always @(req_m1_s1, req_m2_s1, req_m1_s2, req_m2_s2, last_con_to_s1, last_con_to_s2)
 begin
 if ((req_m1_s1 & req_m2_s1) | (req_m1_s2 & req_m2_s2))
  begin
-	//M1 M2 to s1
-    	//if last connection to s1 was from m2 - connect 1st master, from m1 - connect 2nd
-	//(if last_con_to_s1 = 1 last one was m2, = 0 last one was m1)
+
+    	//if last connection to S was from m2 - connect 1st master, from m1 - connect 2nd
+	//(if last_con_to_sx = 1 last one was m2, = 0 last one was m1)
 		c_appr_m1_s1 = (req_m1_s1 & req_m2_s1) & (last_con_to_s1);
-		c_appr_m2_s1 = ~(c_appr_m1_s1);
-    
-	//M1 M2 to s2
-    	//if last connection to s2 was from m2 - connect 1st master, from m1 - connect 2nd
-	//(if last_con_to_s2 = 1 last one was m2, = 0 last one was m1)
+		c_appr_m2_s1 = (req_m1_s1 & req_m2_s1) & ~(last_con_to_s1);
+
 		c_appr_m1_s2 = (req_m1_s2 & req_m2_s2) & (last_con_to_s2);
-		c_appr_m2_s2 = ~(c_appr_m1_s2);	  
+		c_appr_m2_s2 = (req_m1_s2 & req_m2_s2) & ~(last_con_to_s2);	  
  end
 else
  begin
 	c_appr_m1_s1 = req_m1_s1;
 	c_appr_m2_s1 = req_m2_s1;
-	c_appr_m1_s2 = req_m1_s1;
-	c_appr_m2_s2 = req_m2_s1;
+	c_appr_m1_s2 = req_m1_s2;
+	c_appr_m2_s2 = req_m2_s2;
  end
 
 end
