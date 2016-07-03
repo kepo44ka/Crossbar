@@ -163,18 +163,18 @@ if ((req_m1_s1 & req_m2_s1) | (req_m1_s2 & req_m2_s2))
 
     	//if last connection to S was from m2 - connect 1st master, from m1 - connect 2nd
 	//(if last_con_to_sx = 1 last one was m2, = 0 last one was m1)
-		c_appr_m1_s1 = (req_m1_s1 & req_m2_s1) & (last_con_to_s1);
-		c_appr_m2_s1 = (req_m1_s1 & req_m2_s1) & ~(last_con_to_s1);
+		c_appr_m1_s1 <= (req_m1_s1 & req_m2_s1) & (last_con_to_s1);
+		c_appr_m2_s1 <= (req_m1_s1 & req_m2_s1) & ~(last_con_to_s1);
 
-		c_appr_m1_s2 = (req_m1_s2 & req_m2_s2) & (last_con_to_s2);
-		c_appr_m2_s2 = (req_m1_s2 & req_m2_s2) & ~(last_con_to_s2);	  
+		c_appr_m1_s2 <= (req_m1_s2 & req_m2_s2) & (last_con_to_s2);
+		c_appr_m2_s2 <= (req_m1_s2 & req_m2_s2) & ~(last_con_to_s2);	  
  end
 else
  begin
-	c_appr_m1_s1 = req_m1_s1;
-	c_appr_m2_s1 = req_m2_s1;
-	c_appr_m1_s2 = req_m1_s2;
-	c_appr_m2_s2 = req_m2_s2;
+	c_appr_m1_s1 <= req_m1_s1;
+	c_appr_m2_s1 <= req_m2_s1;
+	c_appr_m1_s2 <= req_m1_s2;
+	c_appr_m2_s2 <= req_m2_s2;
  end
 
 end
