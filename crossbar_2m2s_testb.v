@@ -1,4 +1,7 @@
+
 module testbench;
+
+reg clk;
 
   reg var_master_1_req;
   reg var_master_2_req;
@@ -28,6 +31,7 @@ wire [31:0] out_slave_2_addr;
 
 //instance of module being studied
 crossbar_2m2s crossbar(
+  .clk(clk),
   .master_1_req(var_master_1_req),
   .master_2_req(var_master_2_req),
   .slave_1_ack(var_slave_1_ack),
@@ -56,6 +60,8 @@ crossbar_2m2s crossbar(
 
 initial
 begin
+
+clk = 'b0;
 
 var_master_1_req = 'b0;
 var_master_1_cmd = 'b0;
@@ -145,7 +151,7 @@ var_master_1_cmd = 'b0;
 var_master_1_addr = 'hffffffff;
 var_slave_2_rdata = 'h20000001;
 #5;
-var_slave_1_ack = 'b1;
+var_slave_2_ack = 'b1;
 #5;
 var_master_1_req = 'b0;
 var_slave_1_ack = 'b0;
@@ -185,7 +191,7 @@ var_master_1_wdata = 'h11111111;
 var_master_2_req = 'b1;
 var_master_2_cmd = 'b1;
 var_master_2_addr = 32'hffffffff;
-var_master_2_wdata = 32'h22221111;
+var_master_2_wdata = 32'h22222222;
 #5;
 var_slave_1_ack = 'b1;
 var_slave_2_ack = 'b1;
@@ -271,5 +277,6 @@ var_master_2_req = 'b0;
 
 end
 
-
+always
+# 5 clk = ~clk; 
 endmodule
